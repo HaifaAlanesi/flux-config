@@ -2,9 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: linkding
-  namespace: linkding
+  namespace: flux-system
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: linkding
@@ -14,7 +13,16 @@ spec:
         app: linkding
     spec:
       containers:
-        - name: linkding
-          image: sissbruecker/linkding:1.31.0
-          ports:
-            - containerPort: 9090
+      - name: linkding
+        image: sisshiki1985/linkding:latest
+        ports:
+        - containerPort: 9090
+        # This part tells the app WHERE to save data
+        volumeMounts:
+        - name: linkding-data
+          mountPath: /etc/linkding/data
+      # This part defines the "Hard Drive"
+      volumes:
+      - name: linkding-data
+        persistentVolumeClaim:
+          claimName: linkding-pvc
